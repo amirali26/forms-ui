@@ -1,30 +1,12 @@
-import { CognitoUser } from '@aws-amplify/auth/lib';
 import { SnackbarProvider } from 'notistack';
-import React, { useState } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import React from 'react';
 import './App.css';
-import AuthContext from './context/AuthContext';
-import Auth from './pages/Auth';
-import Dashboard from './pages/Dashboard';
+import EnquiryForm from './components/organisms/Enquiry/Form';
 
-const App: React.FC = () => {
-  const [user, setUser] = useState<CognitoUser>();
-
-  return (
-    <SnackbarProvider maxSnack={3}>
-      <AuthContext.Provider value={{ user, setUser }}>
-        <Switch>
-          <Route path="/auth">
-            <Auth />
-          </Route>
-          <Route path="/dashboard">
-            <Dashboard />
-          </Route>
-          <Redirect to="/auth" />
-        </Switch>
-      </AuthContext.Provider>
-    </SnackbarProvider>
-  );
-};
+const App: React.FC = () => (
+  <SnackbarProvider maxSnack={3}>
+    <EnquiryForm />
+  </SnackbarProvider>
+);
 
 export default App;
