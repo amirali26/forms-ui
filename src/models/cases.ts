@@ -4,7 +4,7 @@ export enum CASES {
     DISUPTERESOLUTION ='Dispute Resolution',
     ENERGYUTILITIES = 'Energy, Utilities and Transport',
     MEDIAANDPROPERTY ='Media IT and Intellectual Property',
-    REFULATIONANDCOMPLIANCE = 'Regulation and Compliance',
+    REGULATIONANDCOMPLIANCE = 'Regulation and Compliance',
     ACCIDENTANDINJURY = 'Accident and Injury',
     CONSUMERANDCIVILRIGHTS ='Consumer and Civil Rights',
     EMPLOYMENT = 'Employment',

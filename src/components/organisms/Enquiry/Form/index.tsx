@@ -1,34 +1,46 @@
 import {
-  Button, Checkbox, FormControlLabel, ListSubheader, MenuItem, Select, TextField,
+  Button, Checkbox, FormControlLabel, ListSubheader, MenuItem, Select, TextField, Typography,
 } from 'helpmycase-storybook/dist/components/External';
 import { useFormik } from 'formik';
 import theme from 'helpmycase-storybook/dist/theme/theme';
 import React from 'react';
 import * as Yup from 'yup';
+import Axios from 'axios';
 import useHelpmycaseSnackbar from '../../../../hooks/useHelpmycaseSnackbar';
+import { CASES } from '../../../../models/cases';
+import { Request } from '../../../../models/request';
 
 const initialValues = {
-  name: '',
+  firstName: '',
+  lastName: '',
+  email: '',
+  phoneNumber: '',
+  topic: CASES.ACCIDENTANDINJURY,
+  case: '',
 };
 
 const formValidationSchema = Yup.object().shape({
   firstName: Yup.string()
-    .required('Account name is required'),
+    .max(30, '')
+    .required('This field is required'),
   lastName: Yup.string()
-    .required('Account name is required'),
+    .max(30, '')
+    .required('This field is required'),
   email: Yup.string()
     .email('Invalid email address')
-    .required('Email is a required field'),
+    .required('This field is required'),
   phoneNumber: Yup.string()
     .matches(new RegExp('^[0-9]*$'), 'Phone number should be only numbers')
     .min(10, 'Phone number should be 10 digits')
     .max(10, 'Phone number should be 10 digits')
     .required('Phone number is a required field'),
+  topic: Yup.mixed<CASES>().oneOf(Object.values(CASES), 'Invalid topic selected from dropdown'),
+  case: Yup.string().required('This field is required'),
 });
 
 const EnquiryForm: React.FC = () => {
   const [agreeToTerms, setAgreeToTerms] = React.useState<boolean>(false);
-  const [topic, setTopic] = React.useState(10);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const snackbar = useHelpmycaseSnackbar();
   const formik = useFormik({
@@ -37,58 +49,131 @@ const EnquiryForm: React.FC = () => {
     validationSchema: formValidationSchema,
     onSubmit: async (values) => {
       try {
-        console.log('hi');
-      } catch (e) {
+        setLoading(true);
+        const request: Request = {
+          name: `${values.firstName} ${values.lastName}`,
+          case: values.case,
+          email: values.email,
+          phoneNumber: values.phoneNumber,
+          topic: values.topic as unknown as CASES,
+        };
+
+        const response = await Axios.post('http://localhost:8081/submit', request);
+        snackbar.trigger('Successfully submitted your case', 'success');
+      } catch (e: any) {
         snackbar.trigger(`Something went wrong submitting your request error: ${e.message}`);
+      } finally {
+        setLoading(false);
       }
     },
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (event: any) => {
-    setTopic(event.target.value);
+    formik.setFieldValue('topic', event.target.value);
   };
 
   return (
     <div style={{ backgroundColor: '#F7F7F7' }} className="paddingLeft paddingRight paddingTop paddingBottom">
-      <form className="flex column">
+      <form className="flex column" onSubmit={formik.handleSubmit}>
         <div className="flex row spaceBetween marginBottom">
-          <TextField id="firstName" label="First Name" variant="standard" required fullWidth className="marginRightMedium" />
-          <TextField id="lastName" label="Last Name" variant="standard" required fullWidth className="marginLeftMedium" />
+          <TextField
+            id="firstName"
+            label="First Name"
+            variant="standard"
+            required
+            fullWidth
+            className="marginRightMedium"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            helperText={formik.touched.firstName && formik.errors.firstName}
+            error={Boolean(formik.touched.firstName && formik.errors.firstName)}
+          />
+          <TextField
+            id="lastName"
+            label="Last Name"
+            variant="standard"
+            required
+            fullWidth
+            className="marginLeftMedium"
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            helperText={formik.touched.lastName && formik.errors.lastName}
+            error={Boolean(formik.touched.lastName && formik.errors.lastName)}
+          />
         </div>
         <div className="flex row spaceBetween marginBottom">
-          <TextField id="phoneNumber" label="Phone Number" variant="standard" required fullWidth className="marginRightMedium" />
-          <TextField id="emailAddress" label="Email Address" variant="standard" required fullWidth className="marginLeftMedium" />
+          <TextField
+            id="phoneNumber"
+            label="Phone Number"
+            variant="standard"
+            required
+            fullWidth
+            className="marginRightMedium"
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
+            error={Boolean(formik.touched.phoneNumber && formik.errors.phoneNumber)}
+            InputProps={{
+              startAdornment: (
+                <Typography className="marginRightSmall grey">+44</Typography>
+              ),
+            }}
+          />
+          <TextField
+            id="email"
+            label="Email Address"
+            variant="standard"
+            required
+            fullWidth
+            className="marginLeftMedium"
+            helperText={formik.touched.email && formik.errors.email}
+            error={Boolean(formik.touched.email && formik.errors.email)}
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+          />
         </div>
         <Select
           labelId="demo-simple-select-standard-label"
           id="case"
-          value={topic}
           onChange={handleChange}
           label="Age"
           className="marginBottom"
         >
           <ListSubheader>Business Enquiries</ListSubheader>
-          <MenuItem value="Business Premises">Business Premises</MenuItem>
-          <MenuItem value="Company and Commercial">Company and Commercial</MenuItem>
-          <MenuItem value="Dispute Resolution">Dispute Resolution</MenuItem>
-          <MenuItem value="Energy, Utilities and Transport">Energy, Utilities and Transport</MenuItem>
-          <MenuItem value="Media IT and Intellectual Property">Media IT and Intellectual Property</MenuItem>
-          <MenuItem value="Regulation and Compliance">Regulation and Compliance</MenuItem>
+          <MenuItem value={CASES.BUSINESSPREMISES}>Business Premises</MenuItem>
+          <MenuItem value={CASES.COMPANYANDCOMMERCIAL}>Company and Commercial</MenuItem>
+          <MenuItem value={CASES.DISUPTERESOLUTION}>Dispute Resolution</MenuItem>
+          <MenuItem value={CASES.ENERGYUTILITIES}>Energy, Utilities and Transport</MenuItem>
+          <MenuItem value={CASES.MEDIAANDPROPERTY}>Media IT and Intellectual Property</MenuItem>
+          <MenuItem value={CASES.REGULATIONANDCOMPLIANCE}>Regulation and Compliance</MenuItem>
           <ListSubheader>Consumer Enquiries</ListSubheader>
-          <MenuItem value="Accident and Injury">Accident and Injury</MenuItem>
-          <MenuItem value="Consumer and Civil Rights">Consumer and Civil Rights</MenuItem>
-          <MenuItem value="Employment">Employment</MenuItem>
-          <MenuItem value="Family and Relationships">Family and Relationships</MenuItem>
-          <MenuItem value="Houses, Property and Neighbors">Houses, Property and Neighbors</MenuItem>
-          <MenuItem value="Immigration and Changing Countries">Immigration and Changing Countries</MenuItem>
-          <MenuItem value="Mental Capacity">Mental Capacity</MenuItem>
-          <MenuItem value="Money and Debit">Money and Debit</MenuItem>
-          <MenuItem value="Social Welfare, health and Benefits">Social Welfare, health and Benefits</MenuItem>
-          <MenuItem value="Wills, Trusts and Probate">Wills, Trusts and Probate</MenuItem>
+          <MenuItem value={CASES.ACCIDENTANDINJURY}>Accident and Injury</MenuItem>
+          <MenuItem value={CASES.CONSUMERANDCIVILRIGHTS}>Consumer and Civil Rights</MenuItem>
+          <MenuItem value={CASES.EMPLOYMENT}>Employment</MenuItem>
+          <MenuItem value={CASES.FAMILY}>Family and Relationships</MenuItem>
+          <MenuItem value={CASES.HOUSES}>Houses, Property and Neighbors</MenuItem>
+          <MenuItem value={CASES.IMMIGRATION}>Immigration and Changing Countries</MenuItem>
+          <MenuItem value={CASES.MENTAL}>Mental Capacity</MenuItem>
+          <MenuItem value={CASES.MONEYDEBT}>Money and Debit</MenuItem>
+          <MenuItem value={CASES.SOCIALWELFARE}>Social Welfare, health and Benefits</MenuItem>
+          <MenuItem value={CASES.WILLS}>Wills, Trusts and Probate</MenuItem>
         </Select>
 
-        <TextField id="standard-basic" label="Case Description" variant="outlined" multiline required fullWidth className="marginBottom" rows={10} />
+        <TextField
+          id="case"
+          label="Case Description"
+          variant="outlined"
+          multiline
+          required
+          fullWidth
+          className="marginBottom"
+          rows={10}
+          helperText={formik.touched.case && formik.errors.case}
+          error={Boolean(formik.touched.case && formik.errors.case)}
+          onBlur={formik.handleBlur}
+          onChange={formik.handleChange}
+        />
         <FormControlLabel
           checked={agreeToTerms}
           onChange={() => setAgreeToTerms(!agreeToTerms)}
@@ -102,7 +187,19 @@ const EnquiryForm: React.FC = () => {
             </span>
             )}
         />
-        <Button type="submit" variant="contained" color="primary">Submit application</Button>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={Boolean(
+            !agreeToTerms
+          || !formik.isValid
+          || loading,
+          )}
+        >
+          Submit application
+
+        </Button>
       </form>
     </div>
   );
