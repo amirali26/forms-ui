@@ -1,0 +1,170 @@
+/* Position */
+.absolute {
+    position: absolute;
+}
+.relative {
+    position: relative;
+}
+
+
+/* Alignment  */
+.fullWidth {
+    width: 100%;
+}
+.fullHeight {
+    height: 100%;
+}
+.textAlignCenter {
+    text-align: center;
+}
+.textAlignLeft {
+    text-align: left;
+}
+.flex {
+    display: flex;
+}
+.flex.column {
+    flex-direction: column;
+}
+.flex.row {
+    flex-direction: row;
+}
+.flex.spaceBetween {
+    justify-content: space-between;
+}
+.flex.spaceEvenly {
+    justify-content: space-evenly;
+}
+.flex.center {
+    justify-content: center;
+    align-items: center;
+}
+.flex.alignItemsCenter {
+    align-items: center;
+}
+.flex.alignLeft {
+    align-items: flex-start;
+}
+.flex.justifyContentStart {
+    justify-content: flex-start;
+}
+.alignCenter {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Margins  */
+.marginTop {
+    margin-top: 32px !important
+}
+.marginBottom {
+    margin-bottom: 32px !important
+}
+.marginLeft {
+    margin-left: 32px !important
+}
+.marginRight {
+    margin-right: 32px !important
+}
+.marginTopMedium {
+    margin-top: 16px !important
+}
+.marginBottomMedium {
+    margin-bottom: 16px !important
+}
+.marginLeftMedium {
+    margin-left: 16px !important
+}
+.marginRightMedium {
+    margin-right: 16px !important
+}
+.marginTopSmall {
+    margin-top: 8px !important
+}
+.marginBottomSmall {
+    margin-bottom: 8px !important
+}
+.marginLeftSmall {
+    margin-left: 8px !important
+}
+.marginRightSmall {
+    margin-right: 8px !important
+}
+
+/* Paddings  */
+.paddingTop {
+    padding-top: 32px !important
+}
+.paddingBottom {
+    padding-bottom: 32px !important
+}
+.paddingLeft {
+    padding-left: 32px !important
+}
+.paddingRight {
+    padding-right: 32px !important
+}
+.paddingTopMedium {
+    padding-top: 16px !important
+}
+.paddingBottomMedium {
+    padding-bottom: 16px !important
+}
+.paddingLeftMedium {
+    padding-left: 16px !important
+}
+.paddingRightMedium {
+    padding-right: 16px !important
+}
+.paddingTopSmall {
+    padding-top: 8px !important
+}
+.paddingBottomSmall {
+    padding-bottom: 8px !important
+}
+.paddingLeftSmall {
+    padding-left: 8px !important
+}
+.paddingRightSmall {
+    padding-right: 8px !important
+}
+
+/* Borders */
+.borderRadius {
+    border-radius: 5px;
+}
+.borderNone {
+    border: none;
+}
+
+/* Text Transform */
+.removeUnderline {
+    text-decoration: none;
+}
+.underline {
+    text-decoration: underline;
+}
+.font {
+    font-family: "Lato", Sans-serif;
+    font-size: 16px;
+}
+
+/* Colors */
+.red {
+    color: #981e25 !important;
+}
+.black {
+    color: #121212 !important;
+}
+.white {
+    color: #ffff !important;
+}
+.grey {
+    color: #9999 !important;
+}
+.success {
+    color: #388e3c !important;
+}
+
+/* Button Styles */
