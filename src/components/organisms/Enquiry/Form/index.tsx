@@ -61,7 +61,7 @@ const EnquiryForm: React.FC = () => {
           topic: values.topic as unknown as CASES,
         };
 
-        await Axios.post('http://localhost:8081/submit', request);
+        await Axios.post('https://forms.api.helpmycase.co.uk/submit', request);
         setSuccess(true);
       } catch (e: any) {
         snackbar.trigger(`Something went wrong submitting your request error: ${e.message}`);
