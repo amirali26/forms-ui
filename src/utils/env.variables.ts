@@ -6,17 +6,19 @@ interface CognitoConfig {
 
 interface EnvironmentConfig {
     REACT_APP_API_URL: string;
-    REACT_APP_COGNITO: CognitoConfig;
 }
 
 // Default is development
-const environmentVars: EnvironmentConfig = {
-  REACT_APP_API_URL: 'localhost:3000/',
-  REACT_APP_COGNITO: {
-    poolId: 'eu-west-1_8xuHVtmN3',
-    clientId: '5oucm4sj9u1jdhbd5i6sl0lmof',
-    storage: localStorage,
-  },
+// eslint-disable-next-line import/no-mutable-exports
+let environmentVars: EnvironmentConfig = {
+  REACT_APP_API_URL: 'http://localhost:8080/graphql',
 };
+
+if (window.location.href.startsWith('https://solicitor.helpmycase.co.uk')) {
+  // Default is development
+  environmentVars = {
+    REACT_APP_API_URL: 'https://dashboard-api.helpmycase.co.uk/graphql',
+  };
+}
 
 export default environmentVars;

@@ -11,10 +11,7 @@ import splitLink from './apollo-configuration';
 import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import amplifyConfiguration from './utils/awsExports';
 import history from './utils/routes/history';
-
-Amplify.configure(amplifyConfiguration);
 
 const client = new ApolloClient({
   link: splitLink,

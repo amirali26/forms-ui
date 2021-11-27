@@ -1,16 +1,19 @@
+import { CheckCircle } from '@material-ui/icons';
+import Axios from 'axios';
+import { useFormik } from 'formik';
 import {
   Button, Checkbox, Fade, FormControlLabel, ListSubheader, MenuItem, Select, TextField, Typography,
 } from 'helpmycase-storybook/dist/components/External';
-import { CheckCircle } from '@material-ui/icons';
-import { useFormik } from 'formik';
 import theme from 'helpmycase-storybook/dist/theme/theme';
 import React from 'react';
 import * as Yup from 'yup';
-import Axios from 'axios';
 import useHelpmycaseSnackbar from '../../../../hooks/useHelpmycaseSnackbar';
 import { CASES } from '../../../../models/cases';
 import { Request } from '../../../../models/request';
+import environmentVars from '../../../../utils/env.variables';
 import BigMessage from '../../../molecules/bigMessage';
+
+type AreasOfPractice = { id: string, name: string }[];
 
 const initialValues = {
   firstName: '',
@@ -40,10 +43,33 @@ const formValidationSchema = Yup.object().shape({
   case: Yup.string().required('This field is required'),
 });
 
+async function getAreasOfPractice(): Promise<AreasOfPractice> {
+  try {
+    const response = await Axios({
+      url: environmentVars.REACT_APP_API_URL,
+      method: 'post',
+      data: {
+        query: `
+        query AreasOfPractices {
+          areasOfPractices {
+            id,
+            name
+          }
+        }`,
+      },
+    });
+
+    return response.data.data.areasOfPractices;
+  } catch (e) {
+    throw Error('Error obtaining areas of practice');
+  }
+}
+
 const EnquiryForm: React.FC = () => {
   const [agreeToTerms, setAgreeToTerms] = React.useState<boolean>(false);
+  const [areasOfPractice, setAreasOfPractice] = React.useState<AreasOfPractice>([]);
   const [success, setSuccess] = React.useState<boolean>(false);
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const [loading, setLoading] = React.useState<boolean>(true);
 
   const snackbar = useHelpmycaseSnackbar();
   const formik = useFormik({
@@ -70,6 +96,17 @@ const EnquiryForm: React.FC = () => {
       }
     },
   });
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const response = await getAreasOfPractice();
+        setAreasOfPractice(response);
+      } catch (e) {
+        snackbar.trigger(`Something went wrong submitting your request error: ${e.message}`);
+      }
+    })();
+  }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (event: any) => {
@@ -146,23 +183,13 @@ const EnquiryForm: React.FC = () => {
             className="marginBottom"
           >
             <ListSubheader>Business Enquiries</ListSubheader>
-            <MenuItem value={CASES.BUSINESSPREMISES}>Business Premises</MenuItem>
-            <MenuItem value={CASES.COMPANYANDCOMMERCIAL}>Company and Commercial</MenuItem>
-            <MenuItem value={CASES.DISUPTERESOLUTION}>Dispute Resolution</MenuItem>
-            <MenuItem value={CASES.ENERGYUTILITIES}>Energy, Utilities and Transport</MenuItem>
-            <MenuItem value={CASES.MEDIAANDPROPERTY}>Media IT and Intellectual Property</MenuItem>
-            <MenuItem value={CASES.REGULATIONANDCOMPLIANCE}>Regulation and Compliance</MenuItem>
-            <ListSubheader>Consumer Enquiries</ListSubheader>
-            <MenuItem value={CASES.ACCIDENTANDINJURY}>Accident and Injury</MenuItem>
-            <MenuItem value={CASES.CONSUMERANDCIVILRIGHTS}>Consumer and Civil Rights</MenuItem>
-            <MenuItem value={CASES.EMPLOYMENT}>Employment</MenuItem>
-            <MenuItem value={CASES.FAMILY}>Family and Relationships</MenuItem>
-            <MenuItem value={CASES.HOUSES}>Houses, Property and Neighbors</MenuItem>
-            <MenuItem value={CASES.IMMIGRATION}>Immigration and Changing Countries</MenuItem>
-            <MenuItem value={CASES.MENTAL}>Mental Capacity</MenuItem>
-            <MenuItem value={CASES.MONEYDEBT}>Money and Debit</MenuItem>
-            <MenuItem value={CASES.SOCIALWELFARE}>Social Welfare, health and Benefits</MenuItem>
-            <MenuItem value={CASES.WILLS}>Wills, Trusts and Probate</MenuItem>
+            {
+              areasOfPractice.map((aop) => (
+                <MenuItem value={aop.id} key={aop.id}>
+                  { aop.name }
+                </MenuItem>
+              ))
+            }
           </Select>
 
           <TextField
