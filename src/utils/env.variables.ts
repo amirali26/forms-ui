@@ -14,7 +14,7 @@ let environmentVars: EnvironmentConfig = {
   REACT_APP_API_URL: 'https://localhost:8082/graphql',
 };
 
-if (window.location.pathname.includes('helpmycase.co.uk')) {
+if (window.location.href.includes('helpmycase.co.uk')) {
   // Default is development
   environmentVars = {
     REACT_APP_API_URL: 'https://client-api.helpmycase.co.uk/graphql',
