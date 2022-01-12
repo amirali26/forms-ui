@@ -21,7 +21,7 @@ const initialValues = {
   email: '',
   phoneNumber: '',
   topic: CASES.ACCIDENTANDINJURY,
-  case: '',
+  enquiry: '',
 };
 
 const formValidationSchema = Yup.object().shape({
@@ -39,8 +39,8 @@ const formValidationSchema = Yup.object().shape({
     .min(10, 'Phone number should be 10 digits')
     .max(10, 'Phone number should be 10 digits')
     .required('Phone number is a required field'),
-  topic: Yup.mixed<CASES>().oneOf(Object.values(CASES), 'Invalid topic selected from dropdown'),
-  case: Yup.string().required('This field is required'),
+  topic: Yup.string().required('Invalid topic selected from dropdown'),
+  enquiry: Yup.string().required('This field is required'),
 });
 
 async function getAreasOfPractice(): Promise<AreasOfPractice> {
@@ -65,11 +65,33 @@ async function getAreasOfPractice(): Promise<AreasOfPractice> {
   }
 }
 
+async function submitRequest(request: Request): Promise<void> {
+  try {
+    const response = await Axios({
+      url: environmentVars.REACT_APP_API_URL,
+      method: 'post',
+      data: {
+        query: `
+          mutation AddRequest($ar: RequestInput!) {
+            addRequest(requestInput: $ar) {
+              id,
+            }
+          }`,
+        variables: { ar: { ...request } },
+      },
+    });
+
+    return response.data.data.areasOfPractices;
+  } catch (e) {
+    throw Error('Something went wrong submitting your request, please try again later');
+  }
+}
+
 const EnquiryForm: React.FC = () => {
   const [agreeToTerms, setAgreeToTerms] = React.useState<boolean>(false);
   const [areasOfPractice, setAreasOfPractice] = React.useState<AreasOfPractice>([]);
   const [success, setSuccess] = React.useState<boolean>(false);
-  const [loading, setLoading] = React.useState<boolean>(true);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const snackbar = useHelpmycaseSnackbar();
   const formik = useFormik({
@@ -81,13 +103,13 @@ const EnquiryForm: React.FC = () => {
         setLoading(true);
         const request: Request = {
           name: `${values.firstName} ${values.lastName}`,
-          case: values.case,
-          email: values.email,
           phoneNumber: values.phoneNumber,
-          topic: values.topic as unknown as CASES,
+          description: values.enquiry,
+          email: values.email,
+          topic: values.topic,
         };
 
-        await Axios.post('https://forms-api.helpmycase.co.uk/submit', request);
+        await submitRequest(request);
         setSuccess(true);
       } catch (e: any) {
         snackbar.trigger(`Something went wrong submitting your request error: ${e.message}`);
@@ -100,10 +122,16 @@ const EnquiryForm: React.FC = () => {
   React.useEffect(() => {
     (async () => {
       try {
+        setLoading(true);
         const response = await getAreasOfPractice();
         setAreasOfPractice(response);
+        if (response.length > 0) {
+          formik.setFieldValue('topic', response[0].id);
+        }
       } catch (e) {
         snackbar.trigger(`Something went wrong submitting your request error: ${e.message}`);
+      } finally {
+        setLoading(false);
       }
     })();
   }, []);
@@ -186,14 +214,14 @@ const EnquiryForm: React.FC = () => {
             {
               areasOfPractice.map((aop) => (
                 <MenuItem value={aop.id} key={aop.id}>
-                  { aop.name }
+                  {aop.name}
                 </MenuItem>
               ))
             }
           </Select>
 
           <TextField
-            id="case"
+            id="enquiry"
             label="Case Description"
             variant="outlined"
             multiline
@@ -201,8 +229,8 @@ const EnquiryForm: React.FC = () => {
             fullWidth
             className="marginBottom"
             rows={10}
-            helperText={formik.touched.case && formik.errors.case}
-            error={Boolean(formik.touched.case && formik.errors.case)}
+            helperText={formik.touched.enquiry && formik.errors.enquiry}
+            error={Boolean(formik.touched.enquiry && formik.errors.enquiry)}
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
           />
@@ -225,8 +253,8 @@ const EnquiryForm: React.FC = () => {
             color="primary"
             disabled={Boolean(
               !agreeToTerms
-          || !formik.isValid
-          || loading,
+              || !formik.isValid
+              || loading,
             )}
           >
             Submit application

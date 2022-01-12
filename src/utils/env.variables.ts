@@ -11,13 +11,13 @@ interface EnvironmentConfig {
 // Default is development
 // eslint-disable-next-line import/no-mutable-exports
 let environmentVars: EnvironmentConfig = {
-  REACT_APP_API_URL: 'http://localhost:8080/graphql',
+  REACT_APP_API_URL: 'https://localhost:8082/graphql',
 };
 
-if (window.location.href.startsWith('https://solicitor.helpmycase.co.uk')) {
+if (window.location.pathname.includes('helpmycase.co.uk')) {
   // Default is development
   environmentVars = {
-    REACT_APP_API_URL: 'https://dashboard-api.helpmycase.co.uk/graphql',
+    REACT_APP_API_URL: 'https://client-api.helpmycase.co.uk/graphql',
   };
 }
 
