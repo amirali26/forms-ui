@@ -1,9 +1,10 @@
 import {
-  makeStyles, Theme, createStyles, Backdrop, Modal as MuiModal, Fade,
+  Backdrop, Fade, Modal as MuiModal, Styles,
 } from 'helpmycase-storybook/dist/components/External';
+import theme from 'helpmycase-storybook/dist/theme/theme';
 import React from 'react';
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
+const useStyles = Styles.makeStyles({
   modal: {
     display: 'flex',
     alignItems: 'center',
@@ -15,12 +16,12 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     boxShadow: theme.shadows[5],
     padding: theme.spacing(4, 4, 4, 4),
   },
-}));
+});
 
 interface IProps {
-    open: boolean,
-    children: JSX.Element | JSX.Element[]
-    handleClose: () => void,
+  open: boolean,
+  children: JSX.Element | JSX.Element[]
+  handleClose: () => void,
 }
 const Modal: React.FC<IProps> = ({ open, children, handleClose }: IProps) => {
   const classes = useStyles();
@@ -39,7 +40,7 @@ const Modal: React.FC<IProps> = ({ open, children, handleClose }: IProps) => {
     >
       <Fade in={open}>
         <div className={classes.paper}>
-          { children }
+          {children}
         </div>
       </Fade>
     </MuiModal>

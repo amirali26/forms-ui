@@ -22,7 +22,7 @@ ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
       <ThemeProvider theme={theme}>
-        <Router history={history}>
+        <Router history={history as any}>
           <App />
         </Router>
       </ThemeProvider>

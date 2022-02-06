@@ -4,4 +4,7 @@ export type Request = {
     email: string,
     topic: string,
     description: string,
+    postCode: string,
+    region: string,
+    areaInRegion: string
 }

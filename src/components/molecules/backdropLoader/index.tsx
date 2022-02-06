@@ -1,27 +1,23 @@
 import {
-  Backdrop, CircularProgress, createStyles, makeStyles, Theme,
+  Backdrop, CircularProgress,
 } from 'helpmycase-storybook/dist/components/External';
+import theme from 'helpmycase-storybook/dist/theme/theme';
 import React from 'react';
 
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
-    color: '#fff',
-  },
-}));
-
 interface IProps {
-    open: boolean;
+  open: boolean;
 }
 
-const BackdropLoader: React.FC<IProps> = ({ open }: IProps) => {
-  const classes = useStyles();
-
-  return (
-    <Backdrop className={classes.backdrop} open={open}>
-      <CircularProgress color="inherit" />
-    </Backdrop>
-  );
-};
+const BackdropLoader: React.FC<IProps> = ({ open }: IProps) => (
+  <Backdrop
+    sx={{
+      zIndex: theme.zIndex.drawer + 1,
+      color: '#fff',
+    }}
+    open={open}
+  >
+    <CircularProgress color="inherit" />
+  </Backdrop>
+);
 
 export default BackdropLoader;

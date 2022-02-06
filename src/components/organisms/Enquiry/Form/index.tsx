@@ -1,7 +1,8 @@
-import { CheckCircle } from '@material-ui/icons';
-import Axios from 'axios';
+import { CheckCircle } from '@mui/icons-material';
+import Axios, { AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import {
+  Autocomplete,
   Button, Checkbox, Fade, FormControlLabel, ListSubheader, MenuItem, Select, TextField, Typography,
 } from 'helpmycase-storybook/dist/components/External';
 import theme from 'helpmycase-storybook/dist/theme/theme';
@@ -22,6 +23,9 @@ const initialValues = {
   phoneNumber: '',
   topic: CASES.ACCIDENTANDINJURY,
   enquiry: '',
+  postcode: '',
+  region: '',
+  areaInRegion: '',
 };
 
 const formValidationSchema = Yup.object().shape({
@@ -41,6 +45,9 @@ const formValidationSchema = Yup.object().shape({
     .required('Phone number is a required field'),
   topic: Yup.string().required('Invalid topic selected from dropdown'),
   enquiry: Yup.string().required('This field is required'),
+  postcode: Yup.string().required('Please provide a postcode'),
+  region: Yup.string().required(),
+  areaInRegion: Yup.string().required(),
 });
 
 async function getAreasOfPractice(): Promise<AreasOfPractice> {
@@ -92,7 +99,7 @@ const EnquiryForm: React.FC = () => {
   const [areasOfPractice, setAreasOfPractice] = React.useState<AreasOfPractice>([]);
   const [success, setSuccess] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
-
+  const [options, setOptions] = React.useState<string[]>([]);
   const snackbar = useHelpmycaseSnackbar();
   const formik = useFormik({
     initialValues,
@@ -107,6 +114,9 @@ const EnquiryForm: React.FC = () => {
           description: values.enquiry,
           email: values.email,
           topic: values.topic,
+          areaInRegion: values.areaInRegion,
+          postCode: values.postcode,
+          region: values.region,
         };
 
         await submitRequest(request);
@@ -119,6 +129,24 @@ const EnquiryForm: React.FC = () => {
     },
   });
 
+  const handleAutoComplete = async (postcode: string) => {
+    const response: AxiosResponse<{ status: string, result: string[] }> = await Axios.get(`https://api.postcodes.io/postcodes/${postcode}/autocomplete`);
+    setOptions(response.data.result || []);
+  };
+
+  const handlePostcodeSelect = async (postcode: string) => {
+    const response: any = await Axios.get(`https://api.postcodes.io/postcodes/${postcode}`);
+    if (!response.error) {
+      formik.setFieldValue('postcode', postcode);
+      formik.setFieldValue('areaInRegion', response.data.result.primary_care_trust);
+      formik.setFieldValue('region', response.data.result.region);
+    }
+  };
+
+  const handleChange = (event: any) => {
+    formik.setFieldValue('topic', event.target.value);
+  };
+
   React.useEffect(() => {
     (async () => {
       try {
@@ -128,23 +156,19 @@ const EnquiryForm: React.FC = () => {
         if (response.length > 0) {
           formik.setFieldValue('topic', response[0].id);
         }
-      } catch (e) {
+      } catch (e: any) {
         snackbar.trigger(`Something went wrong submitting your request error: ${e.message}`);
       } finally {
         setLoading(false);
       }
     })();
+    handleAutoComplete('N');
   }, []);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleChange = (event: any) => {
-    formik.setFieldValue('topic', event.target.value);
-  };
 
   return (
     <div style={{ backgroundColor: '#F7F7F7' }} className="paddingLeft paddingRight paddingTop paddingBottom relative">
       <Fade in={!success}>
-        <form className="flex column" onSubmit={formik.handleSubmit}>
+        <form className="flex column" onSubmit={formik.handleSubmit} autoComplete="new-password">
           <div className="flex row spaceBetween marginBottom">
             <TextField
               id="firstName"
@@ -202,6 +226,25 @@ const EnquiryForm: React.FC = () => {
               onChange={formik.handleChange}
             />
           </div>
+          <Autocomplete
+            sx={{ marginBottom: '16px' }}
+            disablePortal
+            id="combo-box-demo"
+            options={options}
+            fullWidth
+            onChange={(e) => handlePostcodeSelect((e.target as any).outerText)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="Postcode"
+                inputProps={{
+                  ...params.inputProps,
+                  autoComplete: 'new-password',
+                }}
+              />
+            )}
+            onInputChange={(event) => handleAutoComplete((event.target as any).value as string)}
+          />
           <Select
             labelId="demo-simple-select-standard-label"
             id="case"
@@ -258,7 +301,6 @@ const EnquiryForm: React.FC = () => {
             )}
           >
             Submit application
-
           </Button>
         </form>
       </Fade>
