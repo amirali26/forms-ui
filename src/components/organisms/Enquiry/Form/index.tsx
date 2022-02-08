@@ -232,7 +232,12 @@ const EnquiryForm: React.FC = () => {
             id="combo-box-demo"
             options={options}
             fullWidth
-            onChange={(e) => handlePostcodeSelect((e.target as any).outerText)}
+            onChange={(e, newValue) => {
+              console.log(e, newValue);
+              if (newValue) {
+                handlePostcodeSelect(newValue);
+              }
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
