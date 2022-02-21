@@ -233,7 +233,6 @@ const EnquiryForm: React.FC = () => {
             options={options}
             fullWidth
             onChange={(e, newValue) => {
-              console.log(e, newValue);
               if (newValue) {
                 handlePostcodeSelect(newValue);
               }
