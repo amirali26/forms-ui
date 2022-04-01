@@ -88,9 +88,12 @@ async function submitRequest(request: Request): Promise<void> {
       },
     });
 
+    if (response.data.errors?.length) {
+      throw Error(response.data.errors[0].extensions?.message || 'Something went wrong submitting your enquiry');
+    }
     return response.data.data.areasOfPractices;
-  } catch (e) {
-    throw Error('Something went wrong submitting your request, please try again later');
+  } catch (e: unknown) {
+    throw Error((e as Error).message || 'Something went wrong submitting your request, please try again later');
   }
 }
 
