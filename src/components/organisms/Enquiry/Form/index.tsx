@@ -12,6 +12,7 @@ import useHelpmycaseSnackbar from '../../../../hooks/useHelpmycaseSnackbar';
 import { CASES } from '../../../../models/cases';
 import { Request } from '../../../../models/request';
 import environmentVars from '../../../../utils/env.variables';
+import BackdropLoader from '../../../molecules/backdropLoader';
 import BigMessage from '../../../molecules/bigMessage';
 
 type AreasOfPractice = { id: string, name: string }[];
@@ -89,7 +90,7 @@ async function submitRequest(request: Request): Promise<void> {
     });
 
     if (response.data.errors?.length) {
-      throw Error(response.data.errors[0].extensions?.message || 'Something went wrong submitting your enquiry');
+      throw Error(response.data.errors[0].message || 'Something went wrong submitting your enquiry');
     }
     return response.data.data.areasOfPractices;
   } catch (e: unknown) {
@@ -124,8 +125,8 @@ const EnquiryForm: React.FC = () => {
 
         await submitRequest(request);
         setSuccess(true);
-      } catch (e: any) {
-        snackbar.trigger(`Something went wrong submitting your request error: ${e.message}`);
+      } catch (e) {
+        snackbar.trigger((e as Error).message);
       } finally {
         setLoading(false);
       }
@@ -170,6 +171,7 @@ const EnquiryForm: React.FC = () => {
 
   return (
     <div style={{ backgroundColor: '#F7F7F7' }} className="paddingLeft paddingRight paddingTop paddingBottom relative">
+      <BackdropLoader open={loading} />
       <Fade in={!success}>
         <form className="flex column" onSubmit={formik.handleSubmit} autoComplete="new-password">
           <div className="flex row spaceBetween marginBottom">
