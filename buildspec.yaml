@@ -2,7 +2,7 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - aws codeartifact login --tool npm --repository helpmycase --domain helpmycase --domain-owner 460234074473
+      - aws codeartifact login --tool npm --repository helpmycase --domain helpmycase --domain-owner 619680812856
       - echo Installing source NPM dependencies...
       - npm install
   build:
