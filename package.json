@@ -41,7 +41,7 @@
   },
   "scripts": {
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
-    "co:login": "aws codeartifact login --tool npm --repository helpmycase --domain helpmycase --domain-owner 460234074473",
+    "co:login": "aws codeartifact login --tool npm --repository helpmycase --domain helpmycase --domain-owner 619680812856",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
