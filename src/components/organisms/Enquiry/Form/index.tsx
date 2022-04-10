@@ -161,7 +161,7 @@ const EnquiryForm: React.FC = () => {
           formik.setFieldValue('topic', response[0].id);
         }
       } catch (e: any) {
-        snackbar.trigger(`Something went wrong submitting your request error: ${e.message}`);
+        snackbar.trigger(e.message);
       } finally {
         setLoading(false);
       }
