@@ -264,7 +264,7 @@ const EnquiryForm: React.FC = () => {
           >
             <ListSubheader>Business Enquiries</ListSubheader>
             {
-              areasOfPractice.map((aop) => (
+              areasOfPractice?.map((aop) => (
                 <MenuItem value={aop.id} key={aop.id}>
                   {aop.name}
                 </MenuItem>
