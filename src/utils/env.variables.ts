@@ -1,9 +1,3 @@
-interface CognitoConfig {
-    poolId: string;
-    clientId: string;
-    storage: Storage;
-}
-
 interface EnvironmentConfig {
     REACT_APP_API_URL: string;
 }
