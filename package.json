@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@apollo/client": "^3.3.21",
+    "@apollo/client": "^3.6.1",
     "@aws-amplify/auth": "^4.0.1",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-brands-svg-icons": "^5.15.4",
@@ -22,7 +22,7 @@
     "axios": "^0.21.1",
     "clsx": "^1.1.1",
     "formik": "^2.2.9",
-    "graphql": "^14.0.0",
+    "graphql": "^16.4.0",
     "helpmycase-storybook": "^0.1.2",
     "history": "^4.10.1",
     "lodash": "^4.17.21",
@@ -42,8 +42,8 @@
   "scripts": {
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "co:login": "aws codeartifact login --tool npm --repository helpmycase --domain helpmycase --domain-owner 619680812856",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "REACT_APP_ENV=dev react-scripts start",
+    "build": "REACT_APP_ENV=prod react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
