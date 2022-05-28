@@ -1,18 +1,13 @@
+/* eslint-disable import/no-dynamic-require */
+/* eslint-disable @typescript-eslint/no-var-requires */
+const env = require(`../config.${process.env.REACT_APP_ENV}.json`);
+
 interface EnvironmentConfig {
-    REACT_APP_API_URL: string;
+  REACT_APP_API_URL: string;
 }
-
 // Default is development
-// eslint-disable-next-line import/no-mutable-exports
-let environmentVars: EnvironmentConfig = {
-  REACT_APP_API_URL: 'https://localhost:8082/graphql',
+const environmentVars: EnvironmentConfig = {
+  REACT_APP_API_URL: env.url,
 };
-
-if (window.location.href.includes('helpmycase.co.uk')) {
-  // Default is development
-  environmentVars = {
-    REACT_APP_API_URL: 'https://client-api.helpmycase.co.uk/graphql',
-  };
-}
 
 export default environmentVars;
