@@ -76,7 +76,7 @@ async function getAreasOfPractice(): Promise<AreasOfPractice> {
 async function submitRequest(request: Request): Promise<void> {
   try {
     const response = await Axios({
-      url: `${environmentVars.REACT_APP_API_URL}`,
+      url: `${window.location.href.includes('loca2lhost') ? 'https://localhost:8082' : environmentVars.REACT_APP_API_URL}/graphql`,
       method: 'post',
       data: {
         query: `
