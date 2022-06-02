@@ -43,7 +43,7 @@
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
     "co:login": "aws codeartifact login --tool npm --repository helpmycase --domain helpmycase --domain-owner 619680812856",
     "start": "REACT_APP_ENV=dev react-scripts start",
-    "build": "REACT_APP_ENV=prod react-scripts build",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
