@@ -99,6 +99,7 @@ async function submitRequest(request: Request): Promise<void> {
 }
 
 const EnquiryForm: React.FC = () => {
+  const [showPhoneNumber, setShowPhoneNumber] = React.useState<boolean>(false);
   const [agreeToTerms, setAgreeToTerms] = React.useState<boolean>(false);
   const [areasOfPractice, setAreasOfPractice] = React.useState<AreasOfPractice>([]);
   const [success, setSuccess] = React.useState<boolean>(false);
@@ -121,6 +122,7 @@ const EnquiryForm: React.FC = () => {
           areaInRegion: values.areaInRegion,
           postCode: values.postcode,
           region: values.region,
+          showPhoneNumber,
         };
 
         await submitRequest(request);
@@ -295,9 +297,17 @@ const EnquiryForm: React.FC = () => {
             label={(
               <span>
                 I agree to the
-                <a href="https://wwww.helpmycase.co.uk/terms" style={{ color: theme.palette.primary.main, fontWeight: 600, paddingLeft: '4px' }}>Terms and Conditions</a>
+                <a href="https://helpmycase.co.uk/terms-of-service/" target="_blank" style={{ color: theme.palette.primary.main, fontWeight: 600, paddingLeft: '4px' }} rel="noreferrer">Terms and Conditions</a>
               </span>
             )}
+          />
+          <FormControlLabel
+            checked={showPhoneNumber}
+            onChange={() => setShowPhoneNumber(!showPhoneNumber)}
+            className="marginBottomMedium"
+            style={{ marginRight: 0 }}
+            control={<Checkbox checked={showPhoneNumber} />}
+            label="Show my phone number publicy to solicitors (this would allow them to be able to contact you via phone)"
           />
           <Button
             type="submit"

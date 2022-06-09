@@ -7,4 +7,5 @@ export type Request = {
     postCode: string,
     region: string,
     areaInRegion: string
+    showPhoneNumber: boolean,
 }
