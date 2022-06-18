@@ -3,7 +3,10 @@ import Axios, { AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import {
   Autocomplete,
-  Button, Checkbox, Fade, FormControlLabel, ListSubheader, MenuItem, Select, TextField, Typography,
+  Box,
+  Button, Checkbox, Fade,
+  FormControlLabel, ListSubheader, MenuItem, Select, Slide, TextField, Typography,
+  LinearProgress,
 } from 'helpmycase-storybook/dist/components/External';
 import theme from 'helpmycase-storybook/dist/theme/theme';
 import React from 'react';
@@ -98,13 +101,34 @@ async function submitRequest(request: Request): Promise<void> {
   }
 }
 
+function calculateHeading(stage: 0 | 1 | 2 | 3 | 4 | 5, prevStage: number) {
+  const calcStage = stage === 0 ? prevStage : stage;
+  switch (calcStage) {
+    case 0:
+    case 1:
+      return '1. Some information about you';
+    case 2:
+      return '2. Contact details';
+    case 3:
+      return '3. Case details';
+    case 4:
+      return '4. Submit application';
+    default:
+      return '1. Some information about you';
+  }
+}
+
 const EnquiryForm: React.FC = () => {
+  const [stage, setStage] = React.useState<0 | 1 | 2 | 3 | 4 | 5>(1);
   const [showPhoneNumber, setShowPhoneNumber] = React.useState<boolean>(false);
   const [agreeToTerms, setAgreeToTerms] = React.useState<boolean>(false);
   const [areasOfPractice, setAreasOfPractice] = React.useState<AreasOfPractice>([]);
   const [success, setSuccess] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [options, setOptions] = React.useState<string[]>([]);
+
+  const formContainerRef = React.useRef(null);
+  const previousValue = React.useRef(1);
   const snackbar = useHelpmycaseSnackbar();
   const formik = useFormik({
     initialValues,
@@ -113,6 +137,7 @@ const EnquiryForm: React.FC = () => {
     onSubmit: async (values) => {
       try {
         setLoading(true);
+        setStage(5);
         const request: Request = {
           name: `${values.firstName} ${values.lastName}`,
           phoneNumber: values.phoneNumber,
@@ -171,159 +196,238 @@ const EnquiryForm: React.FC = () => {
     handleAutoComplete('N');
   }, []);
 
+  const handlePrevious = () => {
+    if (stage === 1) return;
+    const currentStage = stage;
+
+    setStage(0);
+    setTimeout(() => {
+      previousValue.current = currentStage - 1;
+      setStage(currentStage - 1 as any);
+    }, 300);
+  };
+
+  const handleNext = () => {
+    if (stage === 4) return;
+    const currentStage = stage;
+
+    setStage(0);
+    setTimeout(() => {
+      previousValue.current = currentStage + 1;
+      setStage(currentStage + 1 as any);
+    }, 300);
+  };
+
   return (
-    <div style={{ backgroundColor: '#F7F7F7' }} className="paddingLeft paddingRight paddingTop paddingBottom relative">
+    <Box
+      className="paddingLeft paddingRight paddingTop paddingBottom relative"
+      ref={formContainerRef}
+      sx={{
+        height: '100%',
+        '& form': {
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        },
+        '& form > div: first-of-type': {
+          height: '174px',
+          '& > div': {
+            transform: 'translateY(-100%)',
+          },
+        },
+      }}
+    >
+      <Fade in={!success && stage !== 5}>
+        <div>
+          <LinearProgress value={(((stage === 0 ? previousValue.current : stage) / 10) * 100) * 2} sx={{ marginBottom: '16px' }} variant="determinate" />
+          <Typography variant="h5" sx={{ marginBottom: '8px' }}>{calculateHeading(stage, previousValue.current)}</Typography>
+        </div>
+      </Fade>
       <BackdropLoader open={loading} />
-      <Fade in={!success}>
-        <form className="flex column" onSubmit={formik.handleSubmit} autoComplete="new-password">
-          <div className="flex row spaceBetween marginBottom">
-            <TextField
-              id="firstName"
-              label="First Name"
-              variant="standard"
-              required
-              fullWidth
-              className="marginRightMedium"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              helperText={formik.touched.firstName && formik.errors.firstName}
-              error={Boolean(formik.touched.firstName && formik.errors.firstName)}
-            />
-            <TextField
-              id="lastName"
-              label="Last Name"
-              variant="standard"
-              required
-              fullWidth
-              className="marginLeftMedium"
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              helperText={formik.touched.lastName && formik.errors.lastName}
-              error={Boolean(formik.touched.lastName && formik.errors.lastName)}
-            />
-          </div>
-          <div className="flex row spaceBetween marginBottom">
-            <TextField
-              id="phoneNumber"
-              label="Phone Number"
-              variant="standard"
-              required
-              fullWidth
-              className="marginRightMedium"
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
-              error={Boolean(formik.touched.phoneNumber && formik.errors.phoneNumber)}
-              InputProps={{
-                startAdornment: (
-                  <Typography className="marginRightSmall grey">+44</Typography>
-                ),
-              }}
-            />
-            <TextField
-              id="email"
-              label="Email Address"
-              variant="standard"
-              required
-              fullWidth
-              className="marginLeftMedium"
-              helperText={formik.touched.email && formik.errors.email}
-              error={Boolean(formik.touched.email && formik.errors.email)}
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-            />
-          </div>
-          <Autocomplete
-            sx={{ marginBottom: '16px' }}
-            disablePortal
-            id="combo-box-demo"
-            options={options}
-            fullWidth
-            onChange={(e, newValue) => {
-              if (newValue) {
-                handlePostcodeSelect(newValue);
-              }
-            }}
-            renderInput={(params) => (
+      <form className="flex column" onSubmit={formik.handleSubmit} autoComplete="new-password">
+        <div>
+          <Slide
+            direction="right"
+            in={stage === 1}
+            container={formContainerRef.current}
+            unmountOnExit
+            mountOnEnter
+          >
+            <div>
               <TextField
-                {...params}
-                placeholder="Postcode"
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: 'new-password',
+                id="firstName"
+                label="First Name"
+                variant="standard"
+                required
+                fullWidth
+                onChange={formik.handleChange}
+                className="marginBottomMedium"
+                onBlur={formik.handleBlur}
+                value={formik.values.firstName}
+                helperText={formik.touched.firstName && formik.errors.firstName}
+                error={Boolean(formik.touched.firstName && formik.errors.firstName)}
+              />
+              <TextField
+                id="lastName"
+                label="Last Name"
+                variant="standard"
+                required
+                fullWidth
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                value={formik.values.lastName}
+                helperText={formik.touched.lastName && formik.errors.lastName}
+                error={Boolean(formik.touched.lastName && formik.errors.lastName)}
+              />
+            </div>
+          </Slide>
+          <Slide direction="right" in={stage === 2} container={formContainerRef.current} unmountOnExit mountOnEnter>
+            <div>
+              <TextField
+                id="phoneNumber"
+                label="Phone Number"
+                variant="standard"
+                required
+                fullWidth
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                value={formik.values.phoneNumber}
+                helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
+                error={Boolean(formik.touched.phoneNumber && formik.errors.phoneNumber)}
+                InputProps={{
+                  startAdornment: (
+                    <Typography className="marginRightSmall grey">+44</Typography>
+                  ),
                 }}
               />
-            )}
-            onInputChange={(event) => handleAutoComplete((event.target as any).value as string)}
-          />
-          <Select
-            labelId="demo-simple-select-standard-label"
-            id="case"
-            onChange={handleChange}
-            value={formik.values.topic}
-            label="Age"
-            className="marginBottom"
-          >
-            <ListSubheader>Business Enquiries</ListSubheader>
-            {
-              areasOfPractice?.map((aop) => (
-                <MenuItem value={aop.id} key={aop.id}>
-                  {aop.name}
-                </MenuItem>
-              ))
-            }
-          </Select>
-
-          <TextField
-            id="enquiry"
-            label="Case Description"
-            variant="outlined"
-            multiline
-            required
-            fullWidth
-            className="marginBottom"
-            rows={10}
-            helperText={formik.touched.enquiry && formik.errors.enquiry}
-            error={Boolean(formik.touched.enquiry && formik.errors.enquiry)}
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-          />
-          <FormControlLabel
-            checked={agreeToTerms}
-            onChange={() => setAgreeToTerms(!agreeToTerms)}
-            className="marginBottomMedium"
-            style={{ marginRight: 0 }}
-            control={<Checkbox checked={agreeToTerms} />}
-            label={(
-              <span>
-                I agree to the
-                <a href="https://helpmycase.co.uk/terms-of-service/" target="_blank" style={{ color: theme.palette.primary.main, fontWeight: 600, paddingLeft: '4px' }} rel="noreferrer">Terms and Conditions</a>
-              </span>
-            )}
-          />
-          <FormControlLabel
-            checked={showPhoneNumber}
-            onChange={() => setShowPhoneNumber(!showPhoneNumber)}
-            className="marginBottomMedium"
-            style={{ marginRight: 0 }}
-            control={<Checkbox checked={showPhoneNumber} />}
-            label="Show my phone number publicy to solicitors (this would allow them to be able to contact you via phone)"
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={Boolean(
-              !agreeToTerms
-              || !formik.isValid
-              || loading,
-            )}
-          >
-            Submit application
-          </Button>
-        </form>
-      </Fade>
-      <Fade in={success}>
+              <TextField
+                id="email"
+                label="Email Address"
+                className="marginBottomMedium marginTopMedium"
+                variant="standard"
+                required
+                fullWidth
+                value={formik.values.email}
+                helperText={formik.touched.email && formik.errors.email}
+                error={Boolean(formik.touched.email && formik.errors.email)}
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+              />
+              <Autocomplete
+                sx={{ marginBottom: '16px' }}
+                disablePortal
+                id="combo-box-demo"
+                options={options}
+                fullWidth
+                onChange={(e, newValue) => {
+                  if (newValue) {
+                    handlePostcodeSelect(newValue);
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Postcode"
+                    value={formik.values.postcode}
+                    inputProps={{
+                      ...params.inputProps,
+                      autoComplete: 'new-password',
+                    }}
+                  />
+                )}
+                onInputChange={(event) => handleAutoComplete((event.target as any).value as string)}
+              />
+            </div>
+          </Slide>
+          <Slide direction="right" in={stage === 3} container={formContainerRef.current} unmountOnExit mountOnEnter>
+            <div>
+              <Select
+                labelId="demo-simple-select-standard-label"
+                className="marginBottomMedium"
+                id="case"
+                onChange={handleChange}
+                value={formik.values.topic}
+                label="Age"
+                sx={{ width: '100%' }}
+              >
+                <ListSubheader>Business Enquiries</ListSubheader>
+                {
+                  areasOfPractice?.map((aop) => (
+                    <MenuItem value={aop.id} key={aop.id}>
+                      {aop.name}
+                    </MenuItem>
+                  ))
+                }
+              </Select>
+              <TextField
+                id="enquiry"
+                label="Case Description"
+                variant="outlined"
+                multiline
+                required
+                fullWidth
+                rows={3}
+                helperText={formik.touched.enquiry && formik.errors.enquiry}
+                error={Boolean(formik.touched.enquiry && formik.errors.enquiry)}
+                value={formik.values.enquiry}
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+              />
+            </div>
+          </Slide>
+          <Slide direction="right" in={stage === 4} container={formContainerRef.current} unmountOnExit mountOnEnter>
+            <div>
+              <FormControlLabel
+                checked={agreeToTerms}
+                onChange={() => setAgreeToTerms(!agreeToTerms)}
+                style={{ marginRight: 0 }}
+                control={<Checkbox checked={agreeToTerms} />}
+                label={(
+                  <span>
+                    I agree to the
+                    <a href="https://helpmycase.co.uk/terms-of-service/" target="_blank" style={{ color: theme.palette.primary.main, fontWeight: 600, paddingLeft: '4px' }} rel="noreferrer">Terms and Conditions</a>
+                  </span>
+                )}
+              />
+              <FormControlLabel
+                checked={showPhoneNumber}
+                onChange={() => setShowPhoneNumber(!showPhoneNumber)}
+                className="marginBottomMedium"
+                style={{ marginRight: 0 }}
+                control={<Checkbox checked={showPhoneNumber} />}
+                label="Show my phone number publicy to solicitors (this would allow them to be able to contact you via phone)"
+              />
+            </div>
+          </Slide>
+          <div />
+        </div>
+        <Fade in={!success && stage !== 5}>
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }} className="marginTop">
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handlePrevious}
+              disabled={stage === 1}
+            >
+              Previous
+            </Button>
+            <Button
+              type={stage === 4 ? 'submit' : 'button'}
+              variant="contained"
+              color="primary"
+              onClick={stage !== 4 ? handleNext : undefined}
+              disabled={stage === 4 ? Boolean(
+                !agreeToTerms
+                || !formik.isValid
+                || loading,
+              ) : false}
+            >
+              {stage === 4 ? 'Submit Application' : 'Next'}
+            </Button>
+          </div>
+        </Fade>
+      </form>
+      <Fade in={success && stage === 5}>
         <div>
           <BigMessage
             icon={<CheckCircle />}
@@ -335,7 +439,7 @@ const EnquiryForm: React.FC = () => {
           />
         </div>
       </Fade>
-    </div>
+    </Box>
   );
 };
 
