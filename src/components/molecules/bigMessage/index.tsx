@@ -25,10 +25,10 @@ const BigMessage: React.FC<IProps> = ({
   const classes = useStyles();
   return (
     <div className="absolute alignCenter flex column center" style={{ width: '80%', maxWidth: '700px' }}>
-      <div style={{ width: '80px', height: '80px' }} className={classes.iconHolder}>
+      <div style={{ width: '60px', height: '60px' }} className={classes.iconHolder}>
         {icon}
       </div>
-      <Typography variant="h2" className="marginBottomSmall textAlignCenter">{title}</Typography>
+      <Typography variant="h3" className="marginBottomSmall textAlignCenter">{title}</Typography>
       <Typography variant="subtitle1" className="marginBottomMedium textAlignCenter">{subtitle}</Typography>
       {/* <Button variant="contained" color="primary" {...buttonProps}>
         {buttonProps.children}

@@ -254,7 +254,7 @@ const EnquiryForm: React.FC = () => {
       <Fade in={!success && stage !== 5}>
         <div>
           <LinearProgress value={(((stage === 0 ? previousValue.current : stage) / 10) * 100) * 2} sx={{ marginBottom: '16px' }} variant="determinate" />
-          <Typography variant="h5" sx={{ marginBottom: '8px' }}>{calculateHeading(stage, previousValue.current)}</Typography>
+          <Typography variant="h6" sx={{ marginBottom: '8px' }}>{calculateHeading(stage, previousValue.current)}</Typography>
         </div>
       </Fade>
       <BackdropLoader open={loading} />
@@ -446,7 +446,7 @@ const EnquiryForm: React.FC = () => {
           <BigMessage
             icon={<CheckCircle />}
             title="Request Submitted"
-            subtitle="Great news we have successfully received your request. Now sit back and wait for solicitors to contact you regarding your legal case. You should expect to receive your first response within 24 hours!"
+            subtitle="Great news we have successfully received your request. We will email you once solicitors reach out!"
             buttonProps={{
               children: 'Create an account',
             }}
