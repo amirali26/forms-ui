@@ -1,7 +1,6 @@
 import {
   ApolloClient, ApolloProvider, InMemoryCache,
 } from '@apollo/client';
-import Amplify from 'aws-amplify';
 import { ThemeProvider } from 'helpmycase-storybook/dist/components/External';
 import theme from 'helpmycase-storybook/dist/theme/theme';
 import React from 'react';

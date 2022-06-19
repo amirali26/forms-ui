@@ -104,17 +104,16 @@ async function submitRequest(request: Request): Promise<void> {
 function calculateHeading(stage: 0 | 1 | 2 | 3 | 4 | 5, prevStage: number) {
   const calcStage = stage === 0 ? prevStage : stage;
   switch (calcStage) {
-    case 0:
-    case 1:
-      return '1. Some information about you';
     case 2:
       return '2. Contact details';
     case 3:
-      return '3. Case details';
+      return '3. Please provide your name';
     case 4:
       return '4. Submit application';
+    case 0:
+    case 1:
     default:
-      return '1. Some information about you';
+      return '1. Case details';
   }
 }
 
@@ -248,7 +247,7 @@ const EnquiryForm: React.FC = () => {
         <div>
           <Slide
             direction="right"
-            in={stage === 1}
+            in={stage === 3}
             container={formContainerRef.current}
             unmountOnExit
             mountOnEnter
@@ -339,7 +338,7 @@ const EnquiryForm: React.FC = () => {
               />
             </div>
           </Slide>
-          <Slide direction="right" in={stage === 3} container={formContainerRef.current} unmountOnExit mountOnEnter>
+          <Slide direction="right" in={stage === 1} container={formContainerRef.current} unmountOnExit mountOnEnter>
             <div>
               <Select
                 labelId="demo-simple-select-standard-label"
@@ -361,7 +360,7 @@ const EnquiryForm: React.FC = () => {
               </Select>
               <TextField
                 id="enquiry"
-                label="Case Description"
+                label="Brief description of your legal matter"
                 variant="outlined"
                 multiline
                 required
