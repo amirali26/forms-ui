@@ -48,7 +48,7 @@ const formValidationSchema = Yup.object().shape({
     .max(10, 'Phone number should be 10 digits')
     .required('Phone number is a required field'),
   topic: Yup.string().required('Invalid topic selected from dropdown'),
-  enquiry: Yup.string().required('This field is required'),
+  enquiry: Yup.string().min(20, 'Your enquiry is too short').required('This field is required'),
   postcode: Yup.string().required('Please provide a postcode'),
   region: Yup.string().required(),
   areaInRegion: Yup.string().required(),
@@ -159,6 +159,19 @@ const EnquiryForm: React.FC = () => {
     },
   });
 
+  const isStepValidated = (currentStage: 0 | 1 | 2 | 3 | 4 | 5) => {
+    switch (currentStage) {
+      case 1:
+        return Boolean(formik.errors.enquiry || formik.errors.topic);
+      case 2:
+        return Boolean(formik.errors.postcode || formik.errors.email || formik.errors.phoneNumber);
+      case 3:
+        return Boolean(formik.errors.firstName || formik.errors.lastName);
+      default:
+        return false;
+    }
+  };
+
   const handleAutoComplete = async (postcode: string) => {
     const response: AxiosResponse<{ status: string, result: string[] }> = await Axios.get(`https://api.postcodes.io/postcodes/${postcode}/autocomplete`);
     setOptions(response.data.result || []);
@@ -216,6 +229,8 @@ const EnquiryForm: React.FC = () => {
       setStage(currentStage + 1 as any);
     }, 300);
   };
+
+  React.useDebugValue(formik);
 
   return (
     <Box
@@ -419,7 +434,7 @@ const EnquiryForm: React.FC = () => {
                 !agreeToTerms
                 || !formik.isValid
                 || loading,
-              ) : false}
+              ) : isStepValidated(stage)}
             >
               {stage === 4 ? 'Submit Application' : 'Next'}
             </Button>
